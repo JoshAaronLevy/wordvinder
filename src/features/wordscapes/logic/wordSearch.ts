@@ -1,20 +1,7 @@
-import rawWords from 'an-array-of-english-words'
+import { buildWordsByLength, englishWordsUpper } from '../../../shared/dictionary/englishWords'
 import type { WordFinderSubmission, WordGroup } from '../types'
 
-const normalizedWords: string[] = (rawWords as string[])
-  .map((word) => word.toUpperCase())
-  .filter((word) => /^[A-Z]+$/.test(word))
-
-const wordsByLength: Record<number, string[]> = normalizedWords.reduce(
-  (acc, word) => {
-    const len = word.length
-    if (len >= 3 && len <= 8) {
-      acc[len] = acc[len] ? [...acc[len], word] : [word]
-    }
-    return acc
-  },
-  {} as Record<number, string[]>,
-)
+const wordsByLength = buildWordsByLength(englishWordsUpper, 3, 8)
 
 const makeLetterCounts = (letters: string[]) =>
   letters.reduce<Record<string, number>>((map, letter) => {

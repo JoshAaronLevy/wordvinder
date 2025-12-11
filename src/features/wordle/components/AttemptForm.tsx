@@ -3,6 +3,7 @@ import { Button } from 'primereact/button'
 import { Card } from 'primereact/card'
 import { InputText } from 'primereact/inputtext'
 import { SelectButton } from 'primereact/selectbutton'
+import { toAlphaUpper } from '../../../shared/utils/string'
 import type { Attempt, LetterState } from '../types'
 
 type AttemptFormProps = {
@@ -28,9 +29,8 @@ function AttemptForm({ onSubmit, isDisabled }: AttemptFormProps) {
   )
 
   const handleLetterChange = (index: number, value: string) => {
-    const upper = value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 1)
     const next = [...letters]
-    next[index] = upper
+    next[index] = toAlphaUpper(value)
     setLetters(next)
   }
 

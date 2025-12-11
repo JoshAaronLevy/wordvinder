@@ -1,9 +1,5 @@
-import words from 'an-array-of-english-words'
+import { englishWordsLowerSet } from '../../../shared/dictionary/englishWords'
 import type { QuartileWords } from '../types'
-
-const dictionary = new Set(
-  (words as string[]).filter((word) => /^[a-zA-Z]+$/.test(word)).map((word) => word.toLowerCase()),
-)
 
 const factorial = (num: number): number => {
   if (num < 0) return 0
@@ -56,7 +52,7 @@ const generateCombinationsOfSize = (tiles: string[], size: number): string[] => 
 
   return [...new Set(permutations)]
     .map((word) => word.toLowerCase())
-    .filter((word) => dictionary.has(word))
+    .filter((word) => englishWordsLowerSet.has(word))
 }
 
 export const generateCombinations = (tiles: string[]): QuartileWords => {

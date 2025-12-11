@@ -1,10 +1,8 @@
-import words from 'an-array-of-english-words'
+import { englishWordsLower } from '../../../shared/dictionary/englishWords'
 import type { Attempt, LetterState } from '../types'
 
 const WORD_LENGTH = 5
-const BASE_LIST = (words as string[])
-  .filter((word) => word.length === WORD_LENGTH && /^[a-zA-Z]+$/.test(word))
-  .map((word) => word.toLowerCase())
+const BASE_LIST = englishWordsLower.filter((word) => word.length === WORD_LENGTH)
 
 const isPositiveState = (state: LetterState) => state === 'correct' || state === 'present'
 

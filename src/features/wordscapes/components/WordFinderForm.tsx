@@ -4,6 +4,7 @@ import { Card } from 'primereact/card'
 import { Dropdown } from 'primereact/dropdown'
 import { InputText } from 'primereact/inputtext'
 import { Message } from 'primereact/message'
+import { toAlphaUpper } from '../../../shared/utils/string'
 import type { WordFinderSubmission } from '../types'
 
 type Option = {
@@ -58,9 +59,8 @@ function WordFinderForm({ onSubmit, onReset }: WordFinderFormProps) {
   }
 
   const handleLetterChange = (index: number, value: string) => {
-    const alphaOnly = value.toUpperCase().replace(/[^A-Z]/g, '')
     const next = [...letters]
-    next[index] = alphaOnly.slice(0, 1)
+    next[index] = toAlphaUpper(value)
     setLetters(next)
   }
 
