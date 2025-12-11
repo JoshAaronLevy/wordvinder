@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "classnames": "^2.5.1",
     "an-array-of-english-words": "^2.0.0",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
