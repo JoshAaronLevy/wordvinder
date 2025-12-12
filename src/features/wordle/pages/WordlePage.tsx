@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { Tag } from 'primereact/tag'
-import { useNavigate } from 'react-router-dom'
 import AttemptsPanel from '../components/AttemptsPanel'
 import AttemptForm from '../components/AttemptForm'
 import SuggestionsPanel from '../components/SuggestionsPanel'
@@ -11,7 +10,6 @@ const MAX_ATTEMPTS = 6
 
 function WordlePage() {
   const [attempts, setAttempts] = useState<Attempt[]>([])
-  const navigate = useNavigate()
 
   const hasAttempts = attempts.length > 0
 
@@ -51,10 +49,6 @@ function WordlePage() {
         </div>
         <div className="wordle-column">
           <SuggestionsPanel suggestions={suggestions} hasAttempts={hasAttempts} />
-          <button className="link-button" type="button" onClick={() => navigate('/')}>
-            <i className="pi pi-arrow-left" aria-hidden />
-            Back to home
-          </button>
         </div>
       </div>
     </section>

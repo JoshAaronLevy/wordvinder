@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { Tag } from 'primereact/tag'
-import { useNavigate } from 'react-router-dom'
 import ResultsPanel from '../components/ResultsPanel'
 import WordFinderForm from '../components/WordFinderForm'
 import { findMatchingWords } from '../logic/wordSearch'
@@ -9,7 +8,6 @@ import type { WordFinderSubmission, WordGroup } from '../types'
 function WordscapesPage() {
   const [submission, setSubmission] = useState<WordFinderSubmission | null>(null)
   const [results, setResults] = useState<WordGroup[]>([])
-  const navigate = useNavigate()
 
   const totalCount = useMemo(
     () => results.reduce((sum, group) => sum + group.words.length, 0),
@@ -49,10 +47,6 @@ function WordscapesPage() {
       <div className="wordscapes-layout">
         <div className="wordscapes-column">
           <WordFinderForm onSubmit={handleSubmit} onReset={handleReset} />
-          <button className="link-button" type="button" onClick={() => navigate('/')}>
-            <i className="pi pi-arrow-left" aria-hidden />
-            Back to home
-          </button>
         </div>
         <div className="wordscapes-column">
           <ResultsPanel submission={submission} results={results} />

@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { Tag } from 'primereact/tag'
-import { useNavigate } from 'react-router-dom'
 import Board from '../components/Board'
 import BoardControls from '../components/BoardControls'
 import SavedBoards from '../components/SavedBoards'
@@ -19,7 +18,6 @@ function QuartilesPage() {
     fourTiles: [],
   })
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const navigate = useNavigate()
 
   const selectedTiles = selected.map((index) => tiles[index]).filter(Boolean)
   const totalPossibilities = useMemo(
@@ -102,10 +100,6 @@ function QuartilesPage() {
             totalPossibilities={totalPossibilities}
             isAnalyzing={isAnalyzing}
           />
-          <button className="link-button" type="button" onClick={() => navigate('/')}>
-            <i className="pi pi-arrow-left" aria-hidden />
-            Back to home
-          </button>
         </div>
       </div>
     </section>

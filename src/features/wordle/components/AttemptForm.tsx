@@ -13,20 +13,34 @@ type AttemptFormProps = {
 
 const LETTER_COUNT = 5
 
-const stateOptions: { label: string; value: LetterState }[] = [
-  { label: 'Absent', value: 'absent' },
-  { label: 'Present', value: 'present' },
+type StateOption = {
+  label: string
+  value: LetterState
+}
+
+const stateOptions: StateOption[] = [
   { label: 'Correct', value: 'correct' },
+  { label: 'Present', value: 'present' },
+  { label: 'Absent', value: 'absent' },
 ]
+
+const renderStateOption = (option: StateOption) => (
+  <span className="letter-state-option">
+    <span className="sr-only">{option.label}</span>
+    <span className={`letter-state-swatch ${option.value}`} aria-hidden="true" />
+  </span>
+)
 
 function AttemptForm({ onSubmit, isDisabled }: AttemptFormProps) {
   const [letters, setLetters] = useState<string[]>(Array(LETTER_COUNT).fill(''))
-  const [states, setStates] = useState<LetterState[]>(Array(LETTER_COUNT).fill('absent'))
+  const [states, setStates] = useState<(LetterState | null)[]>(Array(LETTER_COUNT).fill(null))
 
-  const isComplete = useMemo(
+  const areLettersFilled = useMemo(
     () => letters.every((letter) => letter.length === 1),
     [letters],
   )
+  const areStatesSelected = useMemo(() => states.every((state) => state !== null), [states])
+  const isComplete = areLettersFilled && areStatesSelected
 
   const handleLetterChange = (index: number, value: string) => {
     const next = [...letters]
@@ -40,23 +54,32 @@ function AttemptForm({ onSubmit, isDisabled }: AttemptFormProps) {
     setStates(next)
   }
 
-  const resetForm = () => {
+  const resetForm = (preserveCorrect = false) => {
+    if (preserveCorrect) {
+      const nextLetters = letters.map((letter, index) =>
+        states[index] === 'correct' ? letter : '',
+      )
+      const nextStates = states.map((state) => (state === 'correct' ? state : null))
+      setLetters(nextLetters)
+      setStates(nextStates)
+      return
+    }
     setLetters(Array(LETTER_COUNT).fill(''))
-    setStates(Array(LETTER_COUNT).fill('absent'))
+    setStates(Array(LETTER_COUNT).fill(null))
   }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!isComplete || isDisabled) return
+    if (!areLettersFilled || !areStatesSelected || isDisabled) return
 
     const attempt: Attempt = {
       letters: letters.map((letter, index) => ({
         letter,
-        state: states[index],
+        state: states[index]!,
       })),
     }
     onSubmit(attempt)
-    resetForm()
+    resetForm(true)
   }
 
   return (
@@ -75,9 +98,11 @@ function AttemptForm({ onSubmit, isDisabled }: AttemptFormProps) {
               <SelectButton
                 value={states[index]}
                 options={stateOptions}
-                optionLabel="label"
                 optionValue="value"
                 onChange={(e) => handleStateChange(index, e.value)}
+                itemTemplate={renderStateOption}
+                className="letter-state-select"
+                aria-label={`State for letter ${index + 1}`}
               />
             </div>
           ))}
@@ -90,7 +115,7 @@ function AttemptForm({ onSubmit, isDisabled }: AttemptFormProps) {
             icon="pi pi-plus"
             disabled={!isComplete || isDisabled}
           />
-          <Button type="button" label="Clear letters" outlined onClick={resetForm} />
+          <Button type="button" label="Clear letters" outlined onClick={() => resetForm()} />
         </div>
       </form>
     </Card>
