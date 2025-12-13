@@ -9,6 +9,7 @@ type ThemeMode = 'light' | 'dark'
 function Layout() {
   const location = useLocation()
   const [isGameMenuOpen, setIsGameMenuOpen] = useState(false)
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
   const [themeMode, setThemeMode] = useState<ThemeMode>('light')
 
   const isGameRouteActive = gameLinks.some((link) => location.pathname.startsWith(link.path))
@@ -32,6 +33,7 @@ function Layout() {
 
   useEffect(() => {
     setIsGameMenuOpen(false)
+    setIsMobileNavOpen(false)
   }, [location.pathname])
 
   const handleGameMenuBlur = (event: FocusEvent<HTMLDivElement>) => {
@@ -44,6 +46,14 @@ function Layout() {
     setThemeMode((prev) => (prev === 'light' ? 'dark' : 'light'))
   }
 
+  const toggleMobileNav = () => {
+    setIsMobileNavOpen((prev) => !prev)
+  }
+
+  const closeMobileNav = () => {
+    setIsMobileNavOpen(false)
+  }
+
   return (
     <div className="layout">
       <header className="app-header">
@@ -52,7 +62,18 @@ function Layout() {
           <span className="brand-name">Word Vinder</span>
         </NavLink>
 
-        <nav className="nav-links">
+        <button
+          type="button"
+          className="mobile-menu-toggle"
+          aria-expanded={isMobileNavOpen}
+          aria-label={isMobileNavOpen ? 'Close menu' : 'Open menu'}
+          aria-controls="primary-navigation"
+          onClick={toggleMobileNav}
+        >
+          <i className={`pi ${isMobileNavOpen ? 'pi-times' : 'pi-bars'}`} aria-hidden />
+        </button>
+
+        <nav className={`nav-links ${isMobileNavOpen ? 'is-open' : ''}`} id="primary-navigation">
           <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'is-active' : ''}`}>
             Home
           </NavLink>
@@ -97,6 +118,12 @@ function Layout() {
           </button>
         </nav>
       </header>
+
+      <div
+        className={`mobile-menu-backdrop ${isMobileNavOpen ? 'is-visible' : ''}`}
+        onClick={closeMobileNav}
+        aria-hidden
+      />
 
       <main className="app-main">
         <div className="content">

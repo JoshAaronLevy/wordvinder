@@ -12,6 +12,7 @@ type BoardControlsProps = {
   onClearSelection: () => void
   onClearBoard: () => void
   disabled?: boolean
+  canAnalyze?: boolean
   children?: ReactNode
 }
 
@@ -23,6 +24,7 @@ function BoardControls({
   onClearSelection,
   onClearBoard,
   disabled,
+  canAnalyze = true,
   children,
 }: BoardControlsProps) {
   const [newTile, setNewTile] = useState('')
@@ -66,7 +68,7 @@ function BoardControls({
                 icon="pi pi-chart-bar"
                 severity="success"
                 onClick={onAnalyze}
-                disabled={!selectedCount || disabled}
+                disabled={!selectedCount || disabled || !canAnalyze}
               />
               <Button
                 label="Clear selection"

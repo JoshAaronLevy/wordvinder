@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { Message } from 'primereact/message'
 import Board from '../components/Board'
 import BoardControls from '../components/BoardControls'
 import SavedBoards from '../components/SavedBoards'
 import WordList from '../components/WordList'
 import { calculateTotalPossibilities, generateCombinations } from '../logic/generator'
 import type { QuartileWords } from '../types'
+import { getLowerWordSet } from '../../../shared/dictionary/englishWords'
 
 const BOARD_SIZE = 20
 
@@ -17,12 +19,40 @@ function QuartilesPage() {
     fourTiles: [],
   })
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [wordSet, setWordSet] = useState<Set<string> | null>(null)
+  const [isDictionaryLoading, setIsDictionaryLoading] = useState(true)
+  const [dictionaryError, setDictionaryError] = useState<string | null>(null)
 
   const selectedTiles = selected.map((index) => tiles[index]).filter(Boolean)
   const totalPossibilities = useMemo(
     () => calculateTotalPossibilities(selectedTiles.length),
     [selectedTiles.length],
   )
+
+  useEffect(() => {
+    let isMounted = true
+    getLowerWordSet()
+      .then((set) => {
+        if (!isMounted) return
+        setWordSet(set)
+        setDictionaryError(null)
+      })
+      .catch((error: Error) => {
+        if (!isMounted) return
+        console.error(error)
+        setWordSet(null)
+        setDictionaryError('Unable to load dictionary data.')
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsDictionaryLoading(false)
+        }
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const handleToggleTile = (index: number) => {
     setSelected((prev) =>
@@ -39,8 +69,9 @@ function QuartilesPage() {
   }
 
   const handleAnalyze = () => {
+    if (!wordSet) return
     setIsAnalyzing(true)
-    const combos = generateCombinations(selectedTiles)
+    const combos = generateCombinations(selectedTiles, wordSet)
     setWords(combos)
     setIsAnalyzing(false)
   }
@@ -74,6 +105,11 @@ function QuartilesPage() {
           </p>
         </div>
       </div>
+      {dictionaryError ? (
+        <Message severity="error" text="Dictionary failed to load. Analysis is unavailable." />
+      ) : (
+        isDictionaryLoading && <Message severity="info" text="Loading dictionary data..." />
+      )}
 
       <div className="quartiles-layout">
         <div className="quartiles-board-column">
@@ -85,6 +121,7 @@ function QuartilesPage() {
             onClearSelection={handleClearSelection}
             onClearBoard={handleClearBoard}
             disabled={isAnalyzing}
+            canAnalyze={!!wordSet}
           >
             <Board tiles={tiles} selected={selected} onToggle={handleToggleTile} />
           </BoardControls>

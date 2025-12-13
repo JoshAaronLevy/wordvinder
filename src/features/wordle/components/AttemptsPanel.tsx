@@ -1,18 +1,11 @@
 import { Button } from 'primereact/button'
 import { Card } from 'primereact/card'
-import { Tag } from 'primereact/tag'
 import type { Attempt } from '../types'
 
 type AttemptsPanelProps = {
   attempts: Attempt[]
   onReset: () => void
   maxAttempts: number
-}
-
-const stateSeverity: Record<string, 'success' | 'warning' | 'secondary'> = {
-  correct: 'success',
-  present: 'warning',
-  absent: 'secondary',
 }
 
 function AttemptsPanel({ attempts, onReset, maxAttempts }: AttemptsPanelProps) {
@@ -30,12 +23,13 @@ function AttemptsPanel({ attempts, onReset, maxAttempts }: AttemptsPanelProps) {
         {attempts.map((attempt, idx) => (
           <div key={idx} className="attempt-row">
             {attempt.letters.map((slot, letterIdx) => (
-              <Tag
+              <span
                 key={`${idx}-${letterIdx}`}
-                value={slot.letter.toUpperCase()}
-                severity={stateSeverity[slot.state]}
-                className="attempt-tag"
-              />
+                className={`attempt-tag letter-state-${slot.state}`}
+                aria-label={`${slot.letter.toUpperCase()} is ${slot.state}`}
+              >
+                {slot.letter.toUpperCase()}
+              </span>
             ))}
           </div>
         ))}

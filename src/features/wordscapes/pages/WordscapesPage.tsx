@@ -1,38 +1,55 @@
-import { useMemo, useState } from 'react'
-import { Tag } from 'primereact/tag'
+import { useEffect, useState } from 'react'
 import ResultsPanel from '../components/ResultsPanel'
 import WordFinderForm from '../components/WordFinderForm'
 import { findMatchingWords } from '../logic/wordSearch'
 import type { WordFinderSubmission, WordGroup } from '../types'
+import { getWordscapesWordsByLength } from '../../../shared/dictionary/englishWords'
 
 function WordscapesPage() {
   const [submission, setSubmission] = useState<WordFinderSubmission | null>(null)
   const [results, setResults] = useState<WordGroup[]>([])
+  const [wordsByLength, setWordsByLength] = useState<Record<number, string[]> | null>(null)
+  const [isDictionaryLoading, setIsDictionaryLoading] = useState(true)
+  const [dictionaryError, setDictionaryError] = useState<string | null>(null)
 
-  const totalCount = useMemo(
-    () => results.reduce((sum, group) => sum + group.words.length, 0),
-    [results],
-  )
+  useEffect(() => {
+    let isMounted = true
+    getWordscapesWordsByLength()
+      .then((map) => {
+        if (!isMounted) return
+        setWordsByLength(map)
+        setDictionaryError(null)
+      })
+      .catch((error: Error) => {
+        if (!isMounted) return
+        console.error(error)
+        setWordsByLength(null)
+        setDictionaryError('Unable to load dictionary data.')
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsDictionaryLoading(false)
+        }
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const handleSubmit = (payload: WordFinderSubmission) => {
     setSubmission(payload)
-    setResults(findMatchingWords(payload))
+    if (!wordsByLength) {
+      setResults([])
+      return
+    }
+    setResults(findMatchingWords(payload, wordsByLength))
   }
 
   const handleReset = () => {
     setSubmission(null)
     setResults([])
   }
-
-  const targetLengthLabel = useMemo(() => {
-    if (!submission?.wordLengths?.length) return 'All lengths'
-    const lengths = [...submission.wordLengths].sort((a, b) => a - b)
-    const label =
-      lengths.length === 1
-        ? `${lengths[0]} letters`
-        : `${lengths.slice(0, -1).join(', ')} and ${lengths[lengths.length - 1]} letters`
-    return `${label} focus`
-  }, [submission])
 
   return (
     <section className="page">
@@ -45,18 +62,23 @@ function WordscapesPage() {
             grouped by length.
           </p>
         </div>
-        <div className="header-tags">
-          <Tag value={`Total matches: ${totalCount}`} severity="info" />
-          <Tag value={targetLengthLabel} severity="secondary" />
-        </div>
       </div>
 
       <div className="wordscapes-layout">
         <div className="wordscapes-column">
-          <WordFinderForm onSubmit={handleSubmit} onReset={handleReset} />
+          <WordFinderForm
+            onSubmit={handleSubmit}
+            onReset={handleReset}
+            isDictionaryReady={!!wordsByLength && !isDictionaryLoading && !dictionaryError}
+          />
         </div>
         <div className="wordscapes-column">
-          <ResultsPanel submission={submission} results={results} />
+          <ResultsPanel
+            submission={submission}
+            results={results}
+            isDictionaryLoading={isDictionaryLoading}
+            dictionaryError={dictionaryError}
+          />
         </div>
       </div>
     </section>

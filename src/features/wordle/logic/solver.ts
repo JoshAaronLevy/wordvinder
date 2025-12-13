@@ -1,15 +1,14 @@
-import { englishWordsLower } from '../../../shared/dictionary/englishWords'
 import type { Attempt, LetterState } from '../types'
 
 const WORD_LENGTH = 5
-const BASE_LIST = englishWordsLower.filter((word) => word.length === WORD_LENGTH)
 
 const isPositiveState = (state: LetterState) => state === 'correct' || state === 'present'
 
-export function suggestWords(attempts: Attempt[]): string[] {
-  if (!attempts.length) return BASE_LIST
+export function suggestWords(attempts: Attempt[], candidates: string[]): string[] {
+  if (!attempts.length) return candidates.filter((word) => word.length === WORD_LENGTH)
 
-  return BASE_LIST.filter((candidate) =>
+  return candidates.filter((candidate) =>
+    candidate.length === WORD_LENGTH &&
     attempts.every((attempt) =>
       attempt.letters.every((slot, index) => {
         const letter = slot.letter.toLowerCase()

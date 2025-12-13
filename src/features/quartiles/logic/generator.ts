@@ -1,4 +1,3 @@
-import { englishWordsLowerSet } from '../../../shared/dictionary/englishWords'
 import type { QuartileWords } from '../types'
 
 const factorial = (num: number): number => {
@@ -42,7 +41,7 @@ const getPermutations = <T,>(array: T[]): T[][] => {
   return result
 }
 
-const generateCombinationsOfSize = (tiles: string[], size: number): string[] => {
+const generateCombinationsOfSize = (tiles: string[], size: number, wordSet: Set<string>): string[] => {
   if (tiles.length < size) return []
 
   const combinations = getCombinations(tiles, size)
@@ -52,10 +51,10 @@ const generateCombinationsOfSize = (tiles: string[], size: number): string[] => 
 
   return [...new Set(permutations)]
     .map((word) => word.toLowerCase())
-    .filter((word) => englishWordsLowerSet.has(word))
+    .filter((word) => wordSet.has(word))
 }
 
-export const generateCombinations = (tiles: string[]): QuartileWords => {
+export const generateCombinations = (tiles: string[], wordSet: Set<string>): QuartileWords => {
   const result: QuartileWords = {
     twoTiles: [],
     threeTiles: [],
@@ -63,15 +62,15 @@ export const generateCombinations = (tiles: string[]): QuartileWords => {
   }
 
   if (tiles.length >= 2) {
-    result.twoTiles = generateCombinationsOfSize(tiles, 2)
+    result.twoTiles = generateCombinationsOfSize(tiles, 2, wordSet)
   }
 
   if (tiles.length >= 3) {
-    result.threeTiles = generateCombinationsOfSize(tiles, 3)
+    result.threeTiles = generateCombinationsOfSize(tiles, 3, wordSet)
   }
 
   if (tiles.length >= 4) {
-    result.fourTiles = generateCombinationsOfSize(tiles, 4)
+    result.fourTiles = generateCombinationsOfSize(tiles, 4, wordSet)
   }
 
   return result

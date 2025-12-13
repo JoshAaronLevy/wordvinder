@@ -4,14 +4,14 @@ import { Card } from 'primereact/card'
 import { InputText } from 'primereact/inputtext'
 import { SelectButton } from 'primereact/selectbutton'
 import { toAlphaUpper } from '../../../shared/utils/string'
-import type { Attempt, LetterState } from '../types'
+import type { Attempt, AttemptHints, LetterState } from '../types'
+import { WORDLE_LETTER_COUNT } from '../types'
 
 type AttemptFormProps = {
   onSubmit: (attempt: Attempt) => void
   isDisabled?: boolean
+  hints: AttemptHints
 }
-
-const LETTER_COUNT = 5
 
 type StateOption = {
   label: string
@@ -31,9 +31,22 @@ const renderStateOption = (option: StateOption) => (
   </span>
 )
 
-function AttemptForm({ onSubmit, isDisabled }: AttemptFormProps) {
-  const [letters, setLetters] = useState<string[]>(Array(LETTER_COUNT).fill(''))
-  const [states, setStates] = useState<(LetterState | null)[]>(Array(LETTER_COUNT).fill(null))
+function AttemptForm({ onSubmit, isDisabled, hints }: AttemptFormProps) {
+  const { positionHints, letterStates } = hints
+  const [letters, setLetters] = useState<string[]>(Array(WORDLE_LETTER_COUNT).fill(''))
+  const [stateSelections, setStateSelections] = useState<(LetterState | null)[]>(
+    Array(WORDLE_LETTER_COUNT).fill(null),
+  )
+  const states = useMemo(
+    () =>
+      stateSelections.map((state, index) => {
+        if (positionHints[index]) {
+          return 'correct'
+        }
+        return state
+      }),
+    [stateSelections, positionHints],
+  )
 
   const areLettersFilled = useMemo(
     () => letters.every((letter) => letter.length === 1),
@@ -42,30 +55,69 @@ function AttemptForm({ onSubmit, isDisabled }: AttemptFormProps) {
   const areStatesSelected = useMemo(() => states.every((state) => state !== null), [states])
   const isComplete = areLettersFilled && areStatesSelected
 
+  const determineStateFromLetter = (letter: string, index: number): LetterState | null => {
+    if (!letter) {
+      return positionHints[index] ? 'correct' : null
+    }
+
+    const upper = letter.toUpperCase()
+    const correctLetter = positionHints[index]
+    if (correctLetter && upper === correctLetter) {
+      return 'correct'
+    }
+
+    const knownState = letterStates[upper]
+    if (!knownState) {
+      return null
+    }
+
+    if (knownState === 'correct') {
+      return 'present'
+    }
+
+    return knownState
+  }
+
   const handleLetterChange = (index: number, value: string) => {
+    const formatted = toAlphaUpper(value)
     const next = [...letters]
-    next[index] = toAlphaUpper(value)
+    next[index] = formatted
     setLetters(next)
+
+    const derivedState = determineStateFromLetter(formatted, index)
+    if (positionHints[index]) return
+
+    setStateSelections((prev) => {
+      if (prev[index] === derivedState) return prev
+      const updated = [...prev]
+      updated[index] = derivedState
+      return updated
+    })
   }
 
   const handleStateChange = (index: number, value: LetterState) => {
-    const next = [...states]
+    if (positionHints[index]) return
+
+    const next = [...stateSelections]
     next[index] = value
-    setStates(next)
+    setStateSelections(next)
   }
 
   const resetForm = (preserveCorrect = false) => {
+    setLetters(Array(WORDLE_LETTER_COUNT).fill(''))
     if (preserveCorrect) {
-      const nextLetters = letters.map((letter, index) =>
-        states[index] === 'correct' ? letter : '',
+      setStateSelections((prev) =>
+        prev.map((_, index) => {
+          if (!positionHints[index] && states[index] === 'correct') {
+            return 'correct'
+          }
+          return null
+        }),
       )
-      const nextStates = states.map((state) => (state === 'correct' ? state : null))
-      setLetters(nextLetters)
-      setStates(nextStates)
       return
     }
-    setLetters(Array(LETTER_COUNT).fill(''))
-    setStates(Array(LETTER_COUNT).fill(null))
+
+    setStateSelections(Array(WORDLE_LETTER_COUNT).fill(null))
   }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -86,26 +138,31 @@ function AttemptForm({ onSubmit, isDisabled }: AttemptFormProps) {
     <Card className="wordle-card" title="Enter attempt">
       <form className="wordle-form" onSubmit={handleSubmit}>
         <div className="letter-grid">
-          {Array.from({ length: LETTER_COUNT }).map((_, index) => (
-            <div key={index} className="letter-cell">
-              <label className="label">Letter {index + 1}</label>
-              <InputText
-                value={letters[index]}
-                onChange={(e) => handleLetterChange(index, e.target.value)}
-                maxLength={1}
-                aria-label={`Letter ${index + 1}`}
-              />
-              <SelectButton
-                value={states[index]}
-                options={stateOptions}
-                optionValue="value"
-                onChange={(e) => handleStateChange(index, e.value)}
-                itemTemplate={renderStateOption}
-                className="letter-state-select"
-                aria-label={`State for letter ${index + 1}`}
-              />
-            </div>
-          ))}
+          {Array.from({ length: WORDLE_LETTER_COUNT }).map((_, index) => {
+            const state = states[index]
+            const inputClassName = state ? `letter-input ${state}` : 'letter-input'
+            return (
+              <div key={index} className="letter-cell">
+                <InputText
+                  value={letters[index]}
+                  onChange={(e) => handleLetterChange(index, e.target.value)}
+                  maxLength={1}
+                  aria-label={`Letter ${index + 1}`}
+                  placeholder={positionHints[index] ?? undefined}
+                  className={inputClassName}
+                />
+                <SelectButton
+                  value={states[index]}
+                  options={stateOptions}
+                  optionValue="value"
+                  onChange={(e) => handleStateChange(index, e.value)}
+                  itemTemplate={renderStateOption}
+                  className="letter-state-select"
+                  aria-label={`State for letter ${index + 1}`}
+                />
+              </div>
+            )
+          })}
         </div>
 
         <div className="actions">
