@@ -19,15 +19,11 @@ function SuggestionsPanel({
 }: SuggestionsPanelProps) {
   const count = suggestions.length
   const hasMatches = count > 0
-  const [listVersion, setListVersion] = useState(0)
   const [isRecomputing, setIsRecomputing] = useState(false)
   const showFiltering = useMinimumDelay(isRecomputing, 200)
+  const [animateIn, setAnimateIn] = useState(false)
 
   useEffect(() => {
-    if (hasMatches) {
-      setListVersion((prev) => prev + 1)
-    }
-
     if (!hasAttempts || isDictionaryLoading || dictionaryError) {
       setIsRecomputing(false)
       return
@@ -36,7 +32,18 @@ function SuggestionsPanel({
     setIsRecomputing(true)
     const frame = window.requestAnimationFrame(() => setIsRecomputing(false))
     return () => window.cancelAnimationFrame(frame)
-  }, [suggestions, hasAttempts, hasMatches, isDictionaryLoading, dictionaryError])
+  }, [suggestions, hasAttempts, isDictionaryLoading, dictionaryError])
+
+  useEffect(() => {
+    if (!hasAttempts || !hasMatches) {
+      setAnimateIn(false)
+      return
+    }
+
+    setAnimateIn(true)
+    const timeout = window.setTimeout(() => setAnimateIn(false), 250)
+    return () => window.clearTimeout(timeout)
+  }, [suggestions, hasAttempts, hasMatches])
 
   return (
     <Card className="wordle-card" title="Possible words">
@@ -70,8 +77,7 @@ function SuggestionsPanel({
             />
           ) : (
             <div
-              key={listVersion}
-              className="suggestions-grid suggestions-animate"
+              className={`suggestions-grid${animateIn ? ' suggestions-enter' : ''}`}
               aria-live="polite"
             >
               {suggestions.map((word) => (
