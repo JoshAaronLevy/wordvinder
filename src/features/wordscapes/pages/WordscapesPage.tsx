@@ -4,6 +4,7 @@ import WordFinderForm from '../components/WordFinderForm'
 import { findMatchingWords } from '../logic/wordSearch'
 import type { WordFinderSubmission, WordGroup } from '../types'
 import { getWordscapesWordsByLength } from '../../../shared/dictionary/englishWords'
+import '../wordscapes.css'
 
 function WordscapesPage() {
   const [submission, setSubmission] = useState<WordFinderSubmission | null>(null)
@@ -52,7 +53,7 @@ function WordscapesPage() {
   }
 
   return (
-    <section className="page">
+    <section className="page wordscapes-page">
       <div className="page-header">
         <div>
           <p className="eyebrow">Wordscapes Vinder (Finder)</p>

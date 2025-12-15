@@ -240,6 +240,39 @@
   gap: 0.5rem;
 }
 
+.wordle-page .results-tabs {
+  margin-top: 1rem;
+  display: inline-flex;
+  gap: 0.3rem;
+  border-radius: 12px;
+  background-color: color-mix(in srgb, var(--surface-card) 80%, var(--surface-100));
+  padding: 0.2rem;
+}
+
+.wordle-page .results-tab {
+  border: none;
+  background: transparent;
+  padding: 0.4rem 0.85rem;
+  border-radius: 10px;
+  font-weight: 600;
+  color: var(--text-color-secondary);
+  transition:
+    color var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    transform var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.wordle-page .results-tab.is-active {
+  color: var(--text-color);
+  background-color: var(--surface-card);
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-flat);
+}
+
+.wordle-page .results-tabpanels {
+  margin-top: 1rem;
+}
+
 .wordle-page .suggestions-grid.suggestions-enter {
   animation: suggestions-enter var(--motion-duration-slow) var(--motion-ease-decelerate);
 }
@@ -276,6 +309,206 @@
   border: 0;
 }
 
+.wordle-page .next-guess-helper {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-color-secondary);
+}
+
+.wordle-page .next-guess-controls {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.wordle-page .penalize-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--surface-border);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.wordle-page .penalize-toggle input {
+  accent-color: var(--primary-color);
+}
+
+.wordle-page .next-guess-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wordle-page .next-guess-row {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  padding: 0.65rem 0.75rem;
+  background-color: color-mix(in srgb, var(--surface-card) 90%, var(--surface-0));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  outline: none;
+  transition:
+    transform var(--motion-duration-fast) var(--motion-ease-standard),
+    border-color var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
+  will-change: transform;
+}
+
+.wordle-page .next-guess-row:hover,
+.wordle-page .next-guess-row:focus-visible {
+  transform: translateY(-1px);
+  border-color: var(--primary-color);
+  box-shadow: var(--elevation-flat);
+}
+
+.wordle-page .next-guess-word-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.wordle-page .next-guess-word {
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.wordle-page .next-guess-meta {
+  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+}
+
+.wordle-page .next-guess-copy-hint {
+  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+}
+
+.wordle-page .next-guess-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.wordle-page .next-guess-info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.wordle-page .next-guess-info-button {
+  border: 1px solid var(--surface-border);
+  background-color: var(--surface-card);
+  color: var(--text-color);
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    color var(--motion-duration-fast) var(--motion-ease-standard),
+    border-color var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.wordle-page .next-guess-info-button:hover,
+.wordle-page .next-guess-info-button:focus-visible {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.wordle-page .next-guess-tooltip {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.35rem);
+  width: min(220px, 70vw);
+  background-color: var(--surface-card);
+  border-radius: 12px;
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--elevation-flat);
+  padding: 0.5rem 0.65rem;
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition:
+    opacity var(--motion-duration-fast) var(--motion-ease-standard),
+    transform var(--motion-duration-fast) var(--motion-ease-standard);
+  z-index: 5;
+}
+
+.wordle-page .next-guess-tooltip.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.wordle-page .next-guess-tooltip-title {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  font-size: 0.85rem;
+}
+
+.wordle-page .next-guess-tooltip-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.wordle-page .next-guess-tooltip-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+}
+
+.wordle-page .next-guess-letter {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-color);
+}
+
+.wordle-page .next-guess-tooltip-meta {
+  text-align: right;
+}
+
+.wordle-page .next-guess-tooltip-penalty {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+}
+
+.wordle-page .wordle-toast {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  background-color: color-mix(in srgb, var(--primary-color) 30%, var(--surface-card));
+  color: var(--primary-color-text, #0f172a);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  animation: toast-fade var(--motion-duration-medium) var(--motion-ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordle-page .results-tab,
+  .wordle-page .next-guess-row,
+  .wordle-page .suggestion-pill,
+  .wordle-page .next-guess-info-button,
+  .wordle-page .next-guess-tooltip {
+    transition: none;
+  }
+}
+
 @media (min-width: 1024px) {
   .wordle-page .letter-grid {
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -294,6 +527,17 @@
     transform: translateY(8px);
   }
 
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
   100% {
     opacity: 1;
     transform: translateY(0);

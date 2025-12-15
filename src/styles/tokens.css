@@ -41,7 +41,8 @@
   box-shadow: var(--focus-ring-shadow), var(--elevation-raised);
 }
 
-.focus-ring-target:focus-visible {
+.focus-ring-target:focus-visible,
+.focus-ring-target:focus-within {
   outline: none;
   box-shadow: var(--focus-ring-shadow);
 }
