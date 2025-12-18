@@ -5,6 +5,7 @@ import HomePage from './app/home/HomePage'
 import QuartilesPage from './features/quartiles/pages/QuartilesPage'
 import WordlePage from './features/wordle/pages/WordlePage'
 import WordscapesPage from './features/wordscapes/pages/WordscapesPage'
+import './styles/tokens.css'
 import './App.css'
 
 function App() {

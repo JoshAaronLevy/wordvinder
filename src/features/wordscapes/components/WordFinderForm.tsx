@@ -128,6 +128,7 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
               placeholder="All lengths (3–8)"
               showClear
               aria-label="Target word lengths"
+              className="focus-ring-target"
             />
           </div>
           <div className="field">
@@ -141,6 +142,7 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
               onChange={(e) => handleLetterCountChange(e.value)}
               placeholder="Choose 4–8 letters"
               aria-label="Number of available letters"
+              className="focus-ring-target"
             />
           </div>
         </div>
@@ -160,6 +162,7 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
                   aria-invalid={showLetterError}
                   autoComplete="off"
                   spellCheck={false}
+                  className="focus-ring-target"
                 />
               </div>
             ))}
@@ -176,8 +179,16 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
             icon="pi pi-search"
             disabled={!canSubmit}
             aria-disabled={!canSubmit}
+            className="interactive-pressable"
           />
-          <Button type="button" label="Reset" severity="secondary" outlined onClick={handleReset} />
+          <Button
+            type="button"
+            label="Reset"
+            severity="secondary"
+            outlined
+            onClick={handleReset}
+            className="interactive-pressable"
+          />
         </div>
       </form>
     </Card>

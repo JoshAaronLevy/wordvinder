@@ -149,7 +149,7 @@ function AttemptForm({ onSubmit, isDisabled, hints }: AttemptFormProps) {
                   maxLength={1}
                   aria-label={`Letter ${index + 1}`}
                   placeholder={positionHints[index] ?? undefined}
-                  className={inputClassName}
+                  className={`${inputClassName} focus-ring-target`}
                 />
                 <SelectButton
                   value={states[index]}
@@ -171,8 +171,15 @@ function AttemptForm({ onSubmit, isDisabled, hints }: AttemptFormProps) {
             label="Add attempt"
             icon="pi pi-plus"
             disabled={!isComplete || isDisabled}
+            className="interactive-pressable"
           />
-          <Button type="button" label="Clear letters" outlined onClick={() => resetForm()} />
+          <Button
+            type="button"
+            label="Clear letters"
+            outlined
+            onClick={() => resetForm()}
+            className="interactive-pressable"
+          />
         </div>
       </form>
     </Card>

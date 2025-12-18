@@ -7,6 +7,7 @@ import { suggestWords } from '../logic/solver'
 import type { Attempt, AttemptHints, LetterState } from '../types'
 import { WORDLE_LETTER_COUNT } from '../types'
 import { getWordleWordList } from '../../../shared/dictionary/englishWords'
+import '../wordle.css'
 
 const MAX_ATTEMPTS = 6
 
@@ -87,7 +88,7 @@ function WordlePage() {
   const handleReset = () => setAttempts([])
 
   return (
-    <section className="page">
+    <section className="page wordle-page">
       <div className="page-header">
         <div>
           <p className="eyebrow">Wordle Vinder (Finder)</p>

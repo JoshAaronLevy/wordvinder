@@ -45,6 +45,7 @@ function AttemptsPanel({ attempts, onReset, maxAttempts }: AttemptsPanelProps) {
           outlined
           onClick={onReset}
           disabled={!attempts.length}
+          className="interactive-pressable"
         />
       </div>
     </Card>

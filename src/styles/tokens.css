@@ -1,0 +1,81 @@
+:root {
+  --motion-duration-fast: 120ms;
+  --motion-duration-medium: 200ms;
+  --motion-duration-slow: 320ms;
+  --motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-ease-decelerate: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --motion-ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --focus-ring-color: color-mix(in srgb, var(--primary-color) 65%, #ffffff);
+  --focus-ring-shadow: 0 0 0 2px color-mix(in srgb, var(--surface-card) 65%, transparent),
+    0 0 0 4px color-mix(in srgb, var(--primary-color) 50%, transparent);
+  --elevation-flat: 0 2px 6px rgba(15, 23, 42, 0.08);
+  --elevation-raised: 0 8px 18px rgba(15, 23, 42, 0.12);
+  --elevation-pressed: 0 4px 10px rgba(15, 23, 42, 0.16);
+  --pulse-scale: 1.02;
+}
+
+.interactive-pressable {
+  transition:
+    transform var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    border-color var(--motion-duration-fast) var(--motion-ease-standard),
+    color var(--motion-duration-fast) var(--motion-ease-standard);
+  box-shadow: var(--elevation-flat);
+  will-change: transform;
+}
+
+.interactive-pressable:hover,
+.interactive-pressable:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: var(--elevation-raised);
+}
+
+.interactive-pressable:active {
+  transform: translateY(1px) scale(0.985);
+  box-shadow: var(--elevation-pressed);
+}
+
+.interactive-pressable:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring-shadow), var(--elevation-raised);
+}
+
+.focus-ring-target:focus-visible,
+.focus-ring-target:focus-within {
+  outline: none;
+  box-shadow: var(--focus-ring-shadow);
+}
+
+.pulse-once {
+  animation: pulse-once var(--motion-duration-medium) var(--motion-ease-emphasized) 1;
+}
+
+@keyframes pulse-once {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(var(--pulse-scale));
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-duration-fast: 1ms;
+    --motion-duration-medium: 1ms;
+    --motion-duration-slow: 1ms;
+  }
+
+  .interactive-pressable,
+  .focus-ring-target {
+    transition-duration: 1ms !important;
+  }
+
+  .pulse-once {
+    animation: none;
+  }
+}
