@@ -1,4 +1,11 @@
-import { useMemo, useState, type CSSProperties, type FormEvent } from 'react'
+import {
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+  type KeyboardEvent,
+} from 'react'
 import { Button } from 'primereact/button'
 import { Card } from 'primereact/card'
 import { Dropdown } from 'primereact/dropdown'
@@ -20,7 +27,7 @@ type WordFinderFormProps = {
   isDictionaryReady: boolean
 }
 
-const letterCountOptions: Option[] = [4, 5, 6, 7, 8].map((count) => ({
+const letterCountOptions: Option[] = [4, 5, 6, 7].map((count) => ({
   label: `${count} letters`,
   value: count,
 }))
@@ -38,6 +45,7 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
   const [wordLengths, setWordLengths] = useState<number[]>([])
   const [letters, setLetters] = useState<string[]>(Array.from({ length: DEFAULT_LETTER_COUNT }, () => ''))
   const [submitted, setSubmitted] = useState(false)
+  const letterInputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const normalizedLetters = useMemo(
     () => letters.map((l) => l.trim().toUpperCase()),
@@ -63,6 +71,23 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
     setLetters(next)
   }
 
+  const focusLetterInput = (index: number) => {
+    const node = letterInputRefs.current[index]
+    if (!node) return
+    node.focus()
+    node.select()
+  }
+
+  const handleLetterKeyUp = (index: number, event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.metaKey || event.ctrlKey || event.altKey) return
+    if (!/^[a-z]$/i.test(event.key)) return
+    handleLetterChange(index, event.key)
+    const nextIndex = index + 1
+    if (nextIndex < letterCount) {
+      focusLetterInput(nextIndex)
+    }
+  }
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setSubmitted(true)
@@ -76,9 +101,8 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
   }
 
   const handleReset = () => {
-    setLetterCount(DEFAULT_LETTER_COUNT)
     setWordLengths([])
-    setLetters(Array.from({ length: DEFAULT_LETTER_COUNT }, () => ''))
+    setLetters(Array.from({ length: letterCount }, () => ''))
     setSubmitted(false)
     onReset()
   }
@@ -133,14 +157,14 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
           </div>
           <div className="field">
             <label className="label" htmlFor="letter-count">
-              Number of available letters (Select between 4 and 8)
+              Number of available letters (Select between 4 and 7)
             </label>
             <Dropdown
               id="letter-count"
               value={letterCount}
               options={letterCountOptions}
               onChange={(e) => handleLetterCountChange(e.value)}
-              placeholder="Choose 4–8 letters"
+              placeholder="Choose 4–7 letters"
               aria-label="Number of available letters"
               className="focus-ring-target"
             />
@@ -157,7 +181,11 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
                   inputMode="text"
                   maxLength={1}
                   value={letters[idx] ?? ''}
+                  ref={(element) => {
+                    letterInputRefs.current[idx] = element
+                  }}
                   onChange={(e) => handleLetterChange(idx, e.target.value)}
+                  onKeyUp={(event) => handleLetterKeyUp(idx, event)}
                   aria-label={`Letter ${idx + 1}`}
                   aria-invalid={showLetterError}
                   autoComplete="off"
