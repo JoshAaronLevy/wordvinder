@@ -89,6 +89,7 @@ function ResultsPanel({ submission, results, isDictionaryLoading, dictionaryErro
   )
 
   const announceToast = (text: string, tone: 'success' | 'error') => {
+    // eslint-disable-next-line react-hooks/purity
     const now = Date.now()
     if (toastMetaRef.current.text === text && now - toastMetaRef.current.timestamp < 1200) {
       return
