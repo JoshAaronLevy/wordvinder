@@ -22,23 +22,7 @@ function ResultsPanel({ submission, results, isDictionaryLoading, dictionaryErro
     return results.map((group) => `${group.length}:${group.words.join('|')}`).join(';')
   }, [results])
 
-  const defaultActiveIndex = useMemo(() => {
-    if (!hasResults) return null
-    let smallestIndex = 0
-    let smallestLength = results[0].length
-    for (let index = 1; index < results.length; index += 1) {
-      if (results[index].length < smallestLength) {
-        smallestLength = results[index].length
-        smallestIndex = index
-      }
-    }
-    return smallestIndex
-  }, [hasResults, results])
-
-  const [selection, setSelection] = useState<{ index: number | null; signature: string }>({
-    index: null,
-    signature: '',
-  })
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [pinnedWords, setPinnedWords] = useState<string[]>([])
   const [animateResults, setAnimateResults] = useState(false)
   const [toastMessage, setToastMessage] = useState<{ text: string; tone: 'success' | 'error' } | null>(
@@ -47,17 +31,13 @@ function ResultsPanel({ submission, results, isDictionaryLoading, dictionaryErro
   const toastTimeoutRef = useRef<number | null>(null)
   const toastMetaRef = useRef<{ text: string; timestamp: number }>({ text: '', timestamp: 0 })
 
-  const activeIndex =
-    selection.signature === resultsSignature
-      ? selection.index ?? defaultActiveIndex
-      : defaultActiveIndex
+  useEffect(() => {
+    setActiveIndex(null)
+  }, [resultsSignature])
 
   const handleAccordionChange = (event: AccordionTabChangeEvent) => {
-    const nextIndex = Array.isArray(event.index) ? event.index[0] : event.index
-    setSelection({
-      index: typeof nextIndex === 'number' ? nextIndex : null,
-      signature: resultsSignature,
-    })
+    const nextIndex = Array.isArray(event.index) ? event.index[0] ?? null : event.index ?? null
+    setActiveIndex(typeof nextIndex === 'number' ? nextIndex : null)
   }
 
   const describeTargetLengths = () => {
