@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -27,15 +28,13 @@ type WordFinderFormProps = {
   isDictionaryReady: boolean
 }
 
-const letterCountOptions: Option[] = [4, 5, 6, 7].map((count) => ({
+const letterCountOptions: Option[] = [3, 4, 5, 6, 7].map((count) => ({
   label: `${count} letters`,
   value: count,
 }))
 
-const wordLengthOptions: Option[] = [3, 4, 5, 6, 7, 8].map((len) => ({
-  label: `${len} letters`,
-  value: len,
-}))
+const wordLengthChoices = [3, 4, 5, 6, 7]
+
 const letterWheelSize = 260
 const letterNodeSize = 58
 const DEFAULT_LETTER_COUNT = 4
@@ -56,6 +55,15 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
     normalizedLetters.length !== letterCount || normalizedLetters.some((l) => l.length !== 1)
 
   const canSubmit = !lettersIncomplete && isDictionaryReady
+  const wordLengthOptions = useMemo<Option[]>(
+    () =>
+      wordLengthChoices
+        .filter((len) => len <= letterCount)
+        .map((len) => ({ label: `${len} letters`, value: len })),
+    [letterCount],
+  )
+  const wordLengthPlaceholder =
+    letterCount <= 3 ? `${letterCount} letters` : `All lengths (3–${letterCount})`
 
   const handleLetterCountChange = (value: number | null) => {
     const nextCount = value ?? DEFAULT_LETTER_COUNT
@@ -63,6 +71,7 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
     setSubmitted(false)
     const nextLetters = Array.from({ length: nextCount }, (_, idx) => normalizedLetters[idx] ?? '')
     setLetters(nextLetters)
+    setWordLengths((current) => current.filter((len) => len <= nextCount))
   }
 
   const handleLetterChange = (index: number, value: string) => {
@@ -113,6 +122,14 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
     setWordLengths((event.value as number[]) ?? [])
   }
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setWordLengths((current) => {
+      const next = current.filter((len) => len <= letterCount)
+      return next.length === current.length ? current : next
+    })
+  }, [letterCount])
+
   const letterPositions = useMemo<CSSProperties[]>(() => {
     if (!letterCount) return []
     const center = letterWheelSize / 2
@@ -138,6 +155,20 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
         )}
         <div className="field-grid">
           <div className="field">
+            <label className="label" htmlFor="letter-count">
+              Number of available letters (Select between 4 and 7)
+            </label>
+            <Dropdown
+              id="letter-count"
+              value={letterCount}
+              options={letterCountOptions}
+              onChange={(e) => handleLetterCountChange(e.value)}
+              placeholder="Choose 4–7 letters"
+              aria-label="Number of available letters"
+              className="focus-ring-target"
+            />
+          </div>
+          <div className="field">
             <label className="label" htmlFor="word-lengths">
               Target word lengths
             </label>
@@ -149,23 +180,9 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
               optionLabel="label"
               optionValue="value"
               display="chip"
-              placeholder="All lengths (3–8)"
+              placeholder={wordLengthPlaceholder}
               showClear
               aria-label="Target word lengths"
-              className="focus-ring-target"
-            />
-          </div>
-          <div className="field">
-            <label className="label" htmlFor="letter-count">
-              Number of available letters (Select between 4 and 7)
-            </label>
-            <Dropdown
-              id="letter-count"
-              value={letterCount}
-              options={letterCountOptions}
-              onChange={(e) => handleLetterCountChange(e.value)}
-              placeholder="Choose 4–7 letters"
-              aria-label="Number of available letters"
               className="focus-ring-target"
             />
           </div>

@@ -59,7 +59,7 @@ function WordscapesPage() {
           <p className="eyebrow">Wordscapes Vinder (Finder)</p>
           <h1>Filter words by letters and length</h1>
           <p className="muted">
-            Choose 4–8 letters, optionally pick target word lengths, and instantly see valid matches
+            Choose 4–7 letters, optionally pick target word lengths, and instantly see valid matches
             grouped by length.
           </p>
         </div>

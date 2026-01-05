@@ -24,6 +24,7 @@ function ResultsPanel({ submission, results, isDictionaryLoading, dictionaryErro
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [pinnedWords, setPinnedWords] = useState<string[]>([])
+  const [usedWords, setUsedWords] = useState<string[]>([])
   const [animateResults, setAnimateResults] = useState(false)
   const [toastMessage, setToastMessage] = useState<{ text: string; tone: 'success' | 'error' } | null>(
     null,
@@ -31,9 +32,25 @@ function ResultsPanel({ submission, results, isDictionaryLoading, dictionaryErro
   const toastTimeoutRef = useRef<number | null>(null)
   const toastMetaRef = useRef<{ text: string; timestamp: number }>({ text: '', timestamp: 0 })
 
+  const singleLengthTarget = useMemo(() => {
+    if (!submission?.wordLengths || submission.wordLengths.length !== 1) return null
+    return submission.wordLengths[0]
+  }, [submission])
+
   useEffect(() => {
-    setActiveIndex(null)
-  }, [resultsSignature])
+    if (!results.length) {
+      setActiveIndex(null)
+      return
+    }
+
+    if (singleLengthTarget === null) {
+      setActiveIndex(null)
+      return
+    }
+
+    const targetIndex = results.findIndex((group) => group.length === singleLengthTarget)
+    setActiveIndex(targetIndex >= 0 ? targetIndex : null)
+  }, [singleLengthTarget, results])
 
   const handleAccordionChange = (event: AccordionTabChangeEvent) => {
     const nextIndex = Array.isArray(event.index) ? event.index[0] ?? null : event.index ?? null
@@ -107,6 +124,7 @@ function ResultsPanel({ submission, results, isDictionaryLoading, dictionaryErro
   }
 
   const pinnedWordSet = useMemo(() => new Set(pinnedWords), [pinnedWords])
+  const usedWordSet = useMemo(() => new Set(usedWords), [usedWords])
 
   const handleCopyWord = async (word: string) => {
     const normalized = word.toUpperCase()
@@ -141,6 +159,15 @@ function ResultsPanel({ submission, results, isDictionaryLoading, dictionaryErro
     })
   }
 
+  const toggleUsedWord = (word: string) => {
+    setUsedWords((current) => {
+      if (current.includes(word)) {
+        return current.filter((item) => item !== word)
+      }
+      return [...current, word]
+    })
+  }
+
   const removePinnedWord = (word: string) => {
     setPinnedWords((current) => current.filter((item) => item !== word))
   }
@@ -148,6 +175,10 @@ function ResultsPanel({ submission, results, isDictionaryLoading, dictionaryErro
   const clearPinnedWords = () => {
     setPinnedWords([])
   }
+
+  useEffect(() => {
+    setUsedWords([])
+  }, [resultsSignature])
 
   const renderPinnedPanel = () => (
     <div className="pinned-panel" aria-live="polite">
@@ -266,14 +297,17 @@ function ResultsPanel({ submission, results, isDictionaryLoading, dictionaryErro
                       <ul className="word-list">
                         {group.words.map((word) => {
                           const isPinned = pinnedWordSet.has(word)
+                          const isUsed = usedWordSet.has(word)
                           return (
                             <li key={word} className="word-list-item">
                               <div className="word-list-card">
                                 <button
                                   type="button"
-                                  className="word-list-button interactive-pressable"
+                                  className={`word-list-button interactive-pressable${isUsed ? ' is-used' : ''}`}
+                                  aria-pressed={isUsed}
                                   onClick={(event) => {
                                     event.stopPropagation()
+                                    toggleUsedWord(word)
                                     handleCopyWord(word)
                                   }}
                                 >

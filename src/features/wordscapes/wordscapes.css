@@ -216,6 +216,15 @@
     background-color var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
+.wordscapes-page .word-list-button.is-used {
+  background-color: color-mix(in srgb, var(--surface-200) 70%, var(--surface-card));
+  border-color: color-mix(in srgb, var(--surface-border) 80%, transparent);
+  color: var(--text-color-secondary);
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  text-decoration-color: color-mix(in srgb, var(--text-color-secondary) 70%, transparent);
+}
+
 .wordscapes-page .word-list-button:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring-shadow);

@@ -7,20 +7,20 @@ import WordscapesImage from '../../assets/Wordscapes.png'
 
 const helpers = [
   {
-    key: 'wordle',
-    title: 'Wordle',
-    description: 'Enter your attempts and tile states to narrow down 5-letter answers.',
-    path: '/wordle',
-    image: WordleImage,
-    imageAlt: 'Wordle solver helper interface preview',
-  },
-  {
     key: 'wordscapes',
     title: 'Wordscapes',
     description: 'Enter 4–8 letters and an optional length to find valid words fast.',
     path: '/wordscapes',
     image: WordscapesImage,
     imageAlt: 'Wordscapes solver example letters',
+  },
+  {
+    key: 'wordle',
+    title: 'Wordle',
+    description: 'Enter your attempts and tile states to narrow down 5-letter answers.',
+    path: '/wordle',
+    image: WordleImage,
+    imageAlt: 'Wordle solver helper interface preview',
   },
   {
     key: 'quartiles',
