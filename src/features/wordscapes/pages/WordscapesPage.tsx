@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
+import { FileUpload } from 'primereact/fileupload'
 import ResultsPanel from '../components/ResultsPanel'
 import WordFinderForm from '../components/WordFinderForm'
 import { findMatchingWords } from '../logic/wordSearch'
 import type { WordFinderSubmission, WordGroup } from '../types'
 import { getWordscapesWordsByLength } from '../../../shared/dictionary/englishWords'
 import '../wordscapes.css'
+import { analyzeBoard } from '../../../services/analyzeBoard'
+import { filterSolvedWords, mapBoardToSubmission } from '../logic/boardAdapter'
 
 function WordscapesPage() {
   const [submission, setSubmission] = useState<WordFinderSubmission | null>(null)
@@ -12,6 +15,7 @@ function WordscapesPage() {
   const [wordsByLength, setWordsByLength] = useState<Record<number, string[]> | null>(null)
   const [isDictionaryLoading, setIsDictionaryLoading] = useState(true)
   const [dictionaryError, setDictionaryError] = useState<string | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   useEffect(() => {
     let isMounted = true
@@ -38,18 +42,53 @@ function WordscapesPage() {
     }
   }, [])
 
-  const handleSubmit = (payload: WordFinderSubmission) => {
+  const runSuggestions = (payload: WordFinderSubmission, solvedWords: string[] = []) => {
     setSubmission(payload)
     if (!wordsByLength) {
       setResults([])
       return
     }
-    setResults(findMatchingWords(payload, wordsByLength))
+    const matches = findMatchingWords(payload, wordsByLength)
+    setResults(solvedWords.length ? filterSolvedWords(matches, solvedWords) : matches)
+  }
+
+  const handleSubmit = (payload: WordFinderSubmission) => {
+    runSuggestions(payload)
   }
 
   const handleReset = () => {
     setSubmission(null)
     setResults([])
+  }
+
+  const handleScreenshotUpload = async (event: { files: File[] }) => {
+    const [file] = event.files
+    if (!file) return
+    setSelectedFile(file)
+
+    const imagePayload = {
+      kind: 'wordvinder.screenshot.upload.v1',
+      file: {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        lastModified: file.lastModified,
+      },
+    }
+
+    console.log('[WordVinder] Selected screenshot file:', file)
+    console.log('[WordVinder] Image payload:', imagePayload)
+
+    try {
+      const result = await analyzeBoard(file)
+      console.log('[WordVinder] Board analysis response:', result)
+      if (result.ok) {
+        const nextSubmission = mapBoardToSubmission(result.board)
+        runSuggestions(nextSubmission, result.board.solvedWords)
+      }
+    } catch (err) {
+      console.warn('[WordVinder] Board analysis failed:', err)
+    }
   }
 
   return (
@@ -67,6 +106,22 @@ function WordscapesPage() {
 
       <div className="wordscapes-layout">
         <div className="wordscapes-column">
+          <div className="wordscapes-upload">
+            <div className="wordscapes-upload-stack">
+              <FileUpload
+                mode="basic"
+                customUpload
+                uploadHandler={handleScreenshotUpload}
+                chooseLabel="Upload Screenshot"
+                auto
+                multiple={false}
+                className="p-button-lg"
+              />
+              {selectedFile && (
+                <small className="muted wordscapes-upload-filename">Selected: {selectedFile.name}</small>
+              )}
+            </div>
+          </div>
           <WordFinderForm
             onSubmit={handleSubmit}
             onReset={handleReset}

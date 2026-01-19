@@ -9,7 +9,7 @@ const helpers = [
   {
     key: 'wordscapes',
     title: 'Wordscapes',
-    description: 'Enter 4–8 letters and an optional length to find valid words fast.',
+    description: 'Enter 4–7 letters and an optional length to find valid words fast.',
     path: '/wordscapes',
     image: WordscapesImage,
     imageAlt: 'Wordscapes solver example letters',

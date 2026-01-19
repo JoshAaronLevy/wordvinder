@@ -26,7 +26,7 @@ export const findMatchingWords = (
   if (!letters.length) return []
 
   const availableCounts = makeLetterCounts(letters)
-  const targetLengths = wordLengths?.length ? wordLengths : [3, 4, 5, 6, 7, 8]
+  const targetLengths = wordLengths?.length ? wordLengths : [3, 4, 5, 6, 7]
 
   const groups: WordGroup[] = []
 

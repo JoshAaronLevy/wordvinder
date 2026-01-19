@@ -78,7 +78,7 @@ export const buildWordsByLength = (list: string[], min: number, max: number) =>
 
 export const getWordscapesWordsByLength = async () => {
   if (!wordscapesPromise) {
-    wordscapesPromise = getUpperWords().then((words) => buildWordsByLength(words, 3, 8))
+    wordscapesPromise = getUpperWords().then((words) => buildWordsByLength(words, 3, 7))
   }
   return wordscapesPromise
 }

@@ -58,7 +58,7 @@ function ResultsPanel({ submission, results, isDictionaryLoading, dictionaryErro
   }
 
   const describeTargetLengths = () => {
-    if (!submission?.wordLengths?.length) return 'All (3–8)'
+    if (!submission?.wordLengths?.length) return 'All (3–7)'
     const lengths = [...submission.wordLengths].sort((a, b) => a - b)
     if (lengths.length === 1) return `${lengths[0]} letters`
     if (lengths.length === 2) return `${lengths[0]} & ${lengths[1]} letters`
@@ -235,7 +235,7 @@ function ResultsPanel({ submission, results, isDictionaryLoading, dictionaryErro
               <Message severity="info" text="Possible words will appear here after you enter letters." />
               <ul className="placeholder-list">
                 <li>Alphabetized matches grouped by word length</li>
-                <li>Filter to specific lengths or view all 3–8 letter words</li>
+                <li>Filter to specific lengths or view all 3–7 letter words</li>
               </ul>
             </div>
           )}
