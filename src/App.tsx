@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import Layout from './app/layout/Layout'
 import NotFoundPage from './app/NotFoundPage'
@@ -5,10 +6,15 @@ import HomePage from './app/home/HomePage'
 import QuartilesPage from './features/quartiles/pages/QuartilesPage'
 import WordlePage from './features/wordle/pages/WordlePage'
 import WordscapesPage from './features/wordscapes/pages/WordscapesPage'
+import { pingDifyMarco } from './services/ping'
 import './styles/tokens.css'
 import './App.css'
 
 function App() {
+  useEffect(() => {
+    void pingDifyMarco()
+  }, [])
+
   return (
     <div className="app-shell">
       <Routes>
