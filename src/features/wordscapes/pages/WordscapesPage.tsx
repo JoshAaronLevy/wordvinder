@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Dialog } from 'primereact/dialog'
 import { FileUpload } from 'primereact/fileupload'
 import ResultsPanel from '../components/ResultsPanel'
 import WordFinderForm from '../components/WordFinderForm'
@@ -16,6 +17,9 @@ function WordscapesPage() {
   const [isDictionaryLoading, setIsDictionaryLoading] = useState(true)
   const [dictionaryError, setDictionaryError] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [analysisDialogVisible, setAnalysisDialogVisible] = useState(false)
+  const [analysisComplete, setAnalysisComplete] = useState(false)
+  const [suggestionsComplete, setSuggestionsComplete] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -42,6 +46,22 @@ function WordscapesPage() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!analysisDialogVisible) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAnalysisComplete(false)
+      setSuggestionsComplete(false)
+    }
+  }, [analysisDialogVisible])
+
+  useEffect(() => {
+    if (!analysisDialogVisible || !suggestionsComplete) return
+    const timeout = window.setTimeout(() => {
+      setAnalysisDialogVisible(false)
+    }, 2000)
+    return () => window.clearTimeout(timeout)
+  }, [analysisDialogVisible, suggestionsComplete])
+
   const runSuggestions = (payload: WordFinderSubmission, solvedWords: string[] = []) => {
     setSubmission(payload)
     if (!wordsByLength) {
@@ -65,6 +85,9 @@ function WordscapesPage() {
     const [file] = event.files
     if (!file) return
     setSelectedFile(file)
+    setAnalysisDialogVisible(true)
+    setAnalysisComplete(false)
+    setSuggestionsComplete(false)
 
     const imagePayload = {
       kind: 'wordvinder.screenshot.upload.v1',
@@ -83,11 +106,16 @@ function WordscapesPage() {
       const result = await analyzeBoard(file)
       console.log('[WordVinder] Board analysis response:', result)
       if (result.ok) {
+        setAnalysisComplete(true)
         const nextSubmission = mapBoardToSubmission(result.board)
         runSuggestions(nextSubmission, result.board.solvedWords)
+        setSuggestionsComplete(true)
+      } else {
+        setAnalysisDialogVisible(false)
       }
     } catch (err) {
       console.warn('[WordVinder] Board analysis failed:', err)
+      setAnalysisDialogVisible(false)
     }
   }
 
@@ -137,6 +165,27 @@ function WordscapesPage() {
           />
         </div>
       </div>
+
+      <Dialog
+        header="AI Board Analysis"
+        visible={analysisDialogVisible}
+        modal
+        closable={false}
+        closeOnEscape={false}
+        dismissableMask={false}
+        draggable={false}
+        resizable={false}
+        className="wordscapes-analysis-dialog"
+        onHide={() => setAnalysisDialogVisible(false)}
+      >
+        <div className="analysis-steps">
+          <div className="analysis-step">1. Running AI Board Analysis</div>
+          <div className={`analysis-step${analysisComplete ? '' : ' is-muted'}`}>
+            2. Identifying Possible Words
+          </div>
+          <div className={`analysis-step${suggestionsComplete ? '' : ' is-muted'}`}>3. Finished!</div>
+        </div>
+      </Dialog>
     </section>
   )
 }
