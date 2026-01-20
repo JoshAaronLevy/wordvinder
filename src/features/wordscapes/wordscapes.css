@@ -27,12 +27,17 @@
 }
 
 .wordscapes-analysis-dialog {
-  width: 80vw;
+  width: 50vw;
+}
+
+.wordscapes-analysis-dialog .p-dialog-content {
+  padding: 1.5rem 0 !important;
+  border-radius: 6px !important;
 }
 
 .wordscapes-page .wordscapes-analysis-dialog {
   width: min(92vw, 420px);
-  border-radius: 18px;
+  border-radius: 6px;
   overflow: hidden;
   box-shadow: 0 24px 50px rgba(20, 18, 12, 0.15);
 }
@@ -60,12 +65,31 @@
   background: linear-gradient(155deg, #fffdf8 0%, #f9f3ea 100%);
   color: #1f1f1f;
   padding: 1.25rem 1.5rem 1.5rem;
+  border-radius: 6px;
 }
 
 .wordscapes-page .analysis-steps {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+.wordscapes-page .analysis-step-summary {
+  margin: 0;
+  text-align: center;
+  animation: wordscapes-summary-fade-up 240ms ease-out;
+}
+
+@keyframes wordscapes-summary-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .wordscapes-page .analysis-step {

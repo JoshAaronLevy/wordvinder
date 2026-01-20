@@ -53,7 +53,7 @@ function WordscapesPage() {
     {
       icon: faDice,
       template: (item: any) => itemRenderer(item, 3),
-      summary: 'Finished! Now go finish that level!'
+      summary: 'Complete! Now go finish that level!'
     }
   ];
 
@@ -275,7 +275,6 @@ function WordscapesPage() {
       </div>
 
       <Dialog
-        header="AI Board Analysis"
         visible={analysisDialogVisible}
         modal
         closable={false}
@@ -284,11 +283,17 @@ function WordscapesPage() {
         draggable={false}
         resizable={false}
         className="wordscapes-analysis-dialog"
+        showHeader={false}
+        footer={null}
         onHide={() => setAnalysisDialogVisible(false)}
       >
         <Steps readOnly={false} model={analysisSteps} activeIndex={activeIndex} />
         <div className="analysis-steps">
-          {/* Step Summary */}
+          {analysisSteps[activeIndex]?.summary && (
+            <h2 key={activeIndex} className="analysis-step-summary" style={{ textAlign: 'center' }}>
+              {analysisSteps[activeIndex].summary}
+            </h2>
+          )}
         </div>
       </Dialog>
     </section>
