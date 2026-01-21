@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "browser-image-compression": "^2.0.2",
     "classnames": "^2.5.1",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
