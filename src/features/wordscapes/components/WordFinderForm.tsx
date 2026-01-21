@@ -148,7 +148,7 @@ function WordFinderForm({ onSubmit, onReset, isDictionaryReady }: WordFinderForm
   }, [letterCount])
 
   return (
-    <Card className="wordscapes-card" title="Set up your level">
+    <Card className="wordscapes-card">
       <form className="wordscapes-form" onSubmit={handleSubmit}>
         {!isDictionaryReady && (
           <Message severity="info" text="Loading dictionary data. You can prepare letters now." />
