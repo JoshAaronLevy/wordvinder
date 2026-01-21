@@ -201,6 +201,8 @@ function WordscapesPage() {
         setSelectedScreenshot(file)
         await advanceAfterDelay()
         setActiveIndex(3)
+        await advanceAfterDelay()
+        setAnalysisDialogVisible(false)
       } else {
         setAnalysisDialogVisible(false)
       }
