@@ -107,7 +107,7 @@ function ScrabblePage() {
       })
       setActiveIndex(1)
 
-      const result = await analyzeBoard(uploadFile)
+      const result = await analyzeBoard(uploadFile, { query: 'SCRABBLE' })
       console.log('[WordVinder] Scrabble analysis response:', result)
 
       if (result.ok) {

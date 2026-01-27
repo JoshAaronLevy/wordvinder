@@ -106,17 +106,28 @@ export type AnalyzeBoardResponse = AnalyzeBoardOk | AnalyzeBoardErr
  * - parse/validate model JSON
  * - return { ok, board, summary }
  */
-export const analyzeBoard = async (file: File): Promise<AnalyzeBoardResponse> => {
+export type AnalyzeBoardOptions = {
+  query?: string
+}
+
+export const analyzeBoard = async (
+  file: File,
+  options: AnalyzeBoardOptions = {}
+): Promise<AnalyzeBoardResponse> => {
   const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/board/parse-screenshot`
 
   console.log('[WordVinder] analyzeBoard request:', {
     endpoint,
     file: { name: file.name, size: file.size, type: file.type },
+    query: options.query,
   })
 
   const formData = new FormData()
   formData.append('image', file)
+  if (options.query) {
+    formData.append('query', options.query)
+  }
 
   const controller = new AbortController()
   const timeoutId = window.setTimeout(() => controller.abort(), API_TIMEOUT_MS)

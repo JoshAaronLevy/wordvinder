@@ -415,7 +415,7 @@ function WordscapesPage() {
       await delay(1000)
       setActiveIndex(1)
 
-      const result = await analyzeBoard(uploadFile)
+      const result = await analyzeBoard(uploadFile, { query: 'WORDSCAPES' })
       console.log('[WordVinder] Image analysis response:', result)
 
       if (result.ok) {
